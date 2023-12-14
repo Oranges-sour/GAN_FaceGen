@@ -23,7 +23,7 @@ class MyDataSet(Dataset):
             img *= 2
 
             tens = torch.from_numpy(img).to(device=device, dtype=torch.float32)
-            self.sample.append((tens, torch.ones((1))))
+            self.sample.append((tens, torch.ones((1), device=device)))
 
     def __len__(self):
         return len(self.sample)

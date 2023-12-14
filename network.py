@@ -5,7 +5,7 @@ import numpy as np
 
 import cv2
 
-device = "cpu"
+device = "cuda"
 
 
 class GeneratorNet(nn.Module):
@@ -35,23 +35,23 @@ class DiscriminatorNet(nn.Module):
         super(DiscriminatorNet, self).__init__()
 
         self.conv1 = nn.Conv2d(
-            in_channels=3, out_channels=32, kernel_size=3, padding=1, device=device
+            in_channels=3, out_channels=8, kernel_size=3, padding=1, device=device
         )
         self.pool1 = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(
-            in_channels=32, out_channels=64, kernel_size=3, padding=1, device=device
+            in_channels=8, out_channels=16, kernel_size=3, padding=1, device=device
         )
         self.pool2 = nn.MaxPool2d(2, 2)
 
-        self.fc1 = nn.Linear(64 * 8 * 8, 512, device=device)
-        self.fc2 = nn.Linear(512, 1, device=device)
+        self.fc1 = nn.Linear(16 * 8 * 8, 128, device=device)
+        self.fc2 = nn.Linear(128, 1, device=device)
 
     def forward(self, x):
         x = torch.relu(self.conv1(x))
         x = self.pool1(x)
         x = torch.relu(self.conv2(x))
         x = self.pool2(x)
-        x = x.reshape(-1, 64 * 8 * 8)
+        x = x.reshape(-1, 16 * 8 * 8)
         x = torch.relu(self.fc1(x))
         x = torch.sigmoid(self.fc2(x))
 
