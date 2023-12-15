@@ -12,7 +12,7 @@ import pygame
 # 使用pygame之前必须初始化
 pygame.init()
 # 设置主屏窗口
-screen = pygame.display.set_mode((32 * 1 * 8, 32 * 1 * 8))
+screen = pygame.display.set_mode((32 * 2 * 8, 32 * 2 * 8))
 screen.fill((0, 0, 0))
 pygame.display.set_caption("main")
 
@@ -30,8 +30,8 @@ generator_net = GeneratorNet()
 discriminator_net = DiscriminatorNet()
 
 correction = nn.BCELoss()
-optimizer_G = optim.Adam(generator_net.parameters(), lr=0.00001, weight_decay=1e-6)
-optimizer_D = optim.Adam(discriminator_net.parameters(), lr=0.00002, weight_decay=1e-3)
+optimizer_G = optim.Adam(generator_net.parameters(), lr=0.0003)
+optimizer_D = optim.Adam(discriminator_net.parameters(), lr=0.0003)
 
 
 print("hi")
@@ -40,11 +40,9 @@ ze = torch.zeros((1, 1), requires_grad=False, device=device)
 on = torch.ones((1, 1), requires_grad=False, device=device)
 
 for epo in range(0, 60000):
-    
-
     # 训练生成器
-    for _ in range(0,3):
-        noise = torch.normal(mean=0.0, std=1.0, size=(1, 256), device=device)
+    for _ in range(0, 3):
+        noise = torch.normal(mean=0.0, std=1.0, size=(1, 100), device=device)
 
         gen_img = generator_net(noise)
         loss_g = correction(discriminator_net(gen_img), on)
@@ -76,7 +74,7 @@ for epo in range(0, 60000):
     loss_d.backward()
     optimizer_D.step()
 
-    if epo % 1500 == 0:
+    if epo % 20 == 0:
         screen.fill((0, 0, 0))
         rand_gen = torch.Generator(device=device)
         rand_gen.manual_seed(114514)
@@ -85,13 +83,11 @@ for epo in range(0, 60000):
         with torch.no_grad():
             for kkk in range(0, 8):
                 for jjj in range(0, 8):
-                    
-
                     noise = torch.normal(
                         mean=0.0,
                         std=1.0,
+                        size=(1, 100),
                         generator=rand_gen,
-                        size=(1, 256),
                         device=device,
                     )
                     gi = generator_net(noise)
@@ -109,7 +105,7 @@ for epo in range(0, 60000):
                     gi = gi.to(device="cpu")
                     for i in range(0, 32):
                         for j in range(0, 32):
-                            w = 1
+                            w = 2
                             pygame.draw.rect(
                                 screen,
                                 color=(

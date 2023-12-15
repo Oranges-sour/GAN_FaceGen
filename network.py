@@ -5,26 +5,67 @@ import numpy as np
 
 import cv2
 
-device = "cuda"
+device = "cpu"
 
 
 class GeneratorNet(nn.Module):
     def __init__(self) -> None:
         super(GeneratorNet, self).__init__()
-        self.fc1 = nn.Linear(256, 256, device=device)
-        self.fc2 = nn.Linear(256, 512, device=device)
-        self.fc3 = nn.Linear(512, 1024, device=device)
-        self.fc4 = nn.Linear(1024, 1024 * 3, device=device)
 
-        # self.conv1 = nn.Conv2d(1, 1, 3, padding=1)
+        self.tconv1 = nn.ConvTranspose2d(
+            in_channels=100, out_channels=1024, kernel_size=4, stride=2, bias=False
+        )
+        self.bn1 = nn.BatchNorm2d(num_features=1024)
+
+        self.tconv2 = nn.ConvTranspose2d(
+            in_channels=1024,
+            out_channels=512,
+            kernel_size=4,
+            stride=2,
+            padding=1,
+            bias=False,
+        )
+        self.bn2 = nn.BatchNorm2d(num_features=512)
+
+        self.tconv3 = nn.ConvTranspose2d(
+            in_channels=512,
+            out_channels=256,
+            kernel_size=4,
+            stride=2,
+            padding=1,
+            bias=False,
+        )
+        self.bn3 = nn.BatchNorm2d(num_features=256)
+
+        self.tconv4 = nn.ConvTranspose2d(
+            in_channels=256,
+            out_channels=128,
+            kernel_size=4,
+            stride=2,
+            padding=1,
+            bias=False,
+        )
+        self.bn4 = nn.BatchNorm2d(num_features=128)
+
+        self.tconv5 = nn.ConvTranspose2d(
+            in_channels=128,
+            out_channels=3,
+            kernel_size=3,
+            stride=1,
+            padding=1,
+            bias=False,
+        )
 
     def forward(self, x):
-        x = torch.tanh(self.fc1(x))
-        x = torch.tanh(self.fc2(x))
-        x = torch.tanh(self.fc3(x))
-        x = torch.tanh(self.fc4(x))
+        x = x.reshape(-1, 100, 1, 1)
 
-        x = x.reshape(-1, 3, 32, 32)
+        x = torch.relu(self.bn1(self.tconv1(x)))
+        x = torch.relu(self.bn2(self.tconv2(x)))
+        x = torch.relu(self.bn3(self.tconv3(x)))
+        x = torch.relu(self.bn4(self.tconv4(x)))
+        x = torch.tanh(self.tconv5(x))
+
+        # print(x.shape)
         # x = torch.nn.functional.interpolate(x, size=(32, 32), mode="bilinear")
 
         return x
