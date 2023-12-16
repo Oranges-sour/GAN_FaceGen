@@ -31,7 +31,7 @@ discriminator_net = DiscriminatorNet()
 
 correction = nn.BCELoss()
 optimizer_G = optim.Adam(generator_net.parameters(), lr=0.00003)
-optimizer_D = optim.Adam(discriminator_net.parameters(), lr=0.00003)
+optimizer_D = optim.Adam(discriminator_net.parameters(), lr=0.000003)
 
 
 print("hi")
@@ -74,7 +74,7 @@ for epo in range(0, 60000):
     loss_d.backward()
     optimizer_D.step()
 
-    if epo % 200 == 0:
+    if epo % 2 == 0:
         screen.fill((0, 0, 0))
         
 

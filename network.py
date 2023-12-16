@@ -5,7 +5,7 @@ import numpy as np
 
 import cv2
 
-device = "cuda"
+device = "cpu"
 
 
 class GeneratorNet(nn.Module):
@@ -84,25 +84,71 @@ class DiscriminatorNet(nn.Module):
     def __init__(self) -> None:
         super(DiscriminatorNet, self).__init__()
 
-        self.conv1 = nn.Conv2d(
-            in_channels=3, out_channels=8, kernel_size=3, padding=1, device=device
-        )
-        self.pool1 = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(
-            in_channels=8, out_channels=16, kernel_size=3, padding=1, device=device
-        )
-        self.pool2 = nn.MaxPool2d(2, 2)
+        self.leaky = nn.LeakyReLU(0.2)
 
-        self.fc1 = nn.Linear(16 * 8 * 8, 128, device=device)
-        self.fc2 = nn.Linear(128, 1, device=device)
+        self.conv1 = nn.Conv2d(
+            in_channels=3,
+            out_channels=64,
+            kernel_size=4,
+            stride=1,
+            padding=1,
+            bias=False,
+            device=device,
+        )
+
+        self.conv2 = nn.Conv2d(
+            in_channels=64,
+            out_channels=128,
+            kernel_size=4,
+            stride=2,
+            padding=1,
+            bias=False,
+            device=device,
+        )
+        self.bn2 = nn.BatchNorm2d(128)
+
+        self.conv3 = nn.Conv2d(
+            in_channels=128,
+            out_channels=256,
+            kernel_size=4,
+            stride=2,
+            padding=1,
+            bias=False,
+            device=device,
+        )
+        self.bn3 = nn.BatchNorm2d(256)
+
+        self.conv4 = nn.Conv2d(
+            in_channels=256,
+            out_channels=512,
+            kernel_size=4,
+            stride=2,
+            padding=1,
+            bias=False,
+            device=device,
+        )
+        self.bn4 = nn.BatchNorm2d(512)
+
+        self.conv5 = nn.Conv2d(
+            in_channels=512,
+            out_channels=1,
+            kernel_size=3,
+            stride=1,
+            padding=0,
+            bias=False,
+            device=device,
+        )
 
     def forward(self, x):
-        x = torch.relu(self.conv1(x))
-        x = self.pool1(x)
-        x = torch.relu(self.conv2(x))
-        x = self.pool2(x)
-        x = x.reshape(-1, 16 * 8 * 8)
-        x = torch.relu(self.fc1(x))
-        x = torch.sigmoid(self.fc2(x))
+        x = self.leaky(self.conv1(x))
+        x = self.leaky(self.bn2(self.conv2(x)))
+        x = self.leaky(self.bn3(self.conv3(x)))
+        x = self.leaky(self.bn4(self.conv4(x)))
+
+        # print(x.shape)
+
+        x = torch.sigmoid(self.conv5(x))
+
+        x = x.reshape(-1, 1)
 
         return x
