@@ -5,7 +5,7 @@ import numpy as np
 
 import cv2
 
-device = "cpu"
+device = "cuda"
 
 
 class GeneratorNet(nn.Module):
@@ -13,9 +13,14 @@ class GeneratorNet(nn.Module):
         super(GeneratorNet, self).__init__()
 
         self.tconv1 = nn.ConvTranspose2d(
-            in_channels=100, out_channels=1024, kernel_size=4, stride=2, bias=False
+            in_channels=100,
+            out_channels=1024,
+            kernel_size=4,
+            stride=2,
+            bias=False,
+            device=device,
         )
-        self.bn1 = nn.BatchNorm2d(num_features=1024)
+        self.bn1 = nn.BatchNorm2d(num_features=1024, device=device)
 
         self.tconv2 = nn.ConvTranspose2d(
             in_channels=1024,
@@ -24,8 +29,9 @@ class GeneratorNet(nn.Module):
             stride=2,
             padding=1,
             bias=False,
+            device=device,
         )
-        self.bn2 = nn.BatchNorm2d(num_features=512)
+        self.bn2 = nn.BatchNorm2d(num_features=512, device=device)
 
         self.tconv3 = nn.ConvTranspose2d(
             in_channels=512,
@@ -34,8 +40,9 @@ class GeneratorNet(nn.Module):
             stride=2,
             padding=1,
             bias=False,
+            device=device,
         )
-        self.bn3 = nn.BatchNorm2d(num_features=256)
+        self.bn3 = nn.BatchNorm2d(num_features=256, device=device)
 
         self.tconv4 = nn.ConvTranspose2d(
             in_channels=256,
@@ -44,8 +51,9 @@ class GeneratorNet(nn.Module):
             stride=2,
             padding=1,
             bias=False,
+            device=device,
         )
-        self.bn4 = nn.BatchNorm2d(num_features=128)
+        self.bn4 = nn.BatchNorm2d(num_features=128, device=device)
 
         self.tconv5 = nn.ConvTranspose2d(
             in_channels=128,
@@ -54,6 +62,7 @@ class GeneratorNet(nn.Module):
             stride=1,
             padding=1,
             bias=False,
+            device=device,
         )
 
     def forward(self, x):

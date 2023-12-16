@@ -30,8 +30,8 @@ generator_net = GeneratorNet()
 discriminator_net = DiscriminatorNet()
 
 correction = nn.BCELoss()
-optimizer_G = optim.Adam(generator_net.parameters(), lr=0.0003)
-optimizer_D = optim.Adam(discriminator_net.parameters(), lr=0.0003)
+optimizer_G = optim.Adam(generator_net.parameters(), lr=0.00003)
+optimizer_D = optim.Adam(discriminator_net.parameters(), lr=0.00003)
 
 
 print("hi")
@@ -74,15 +74,18 @@ for epo in range(0, 60000):
     loss_d.backward()
     optimizer_D.step()
 
-    if epo % 20 == 0:
+    if epo % 200 == 0:
         screen.fill((0, 0, 0))
-        rand_gen = torch.Generator(device=device)
-        rand_gen.manual_seed(114514)
+        
 
         generator_net.eval()
         with torch.no_grad():
             for kkk in range(0, 8):
                 for jjj in range(0, 8):
+
+                    rand_gen = torch.Generator(device=device)
+                    rand_gen.manual_seed(kkk * 100 + jjj)
+
                     noise = torch.normal(
                         mean=0.0,
                         std=1.0,
