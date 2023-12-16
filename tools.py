@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader, Dataset
 class MyDataSet(Dataset):
     def __init__(self):
         self.sample = []
-        for i in range(0, 2):
+        for i in range(0, 21):
             file = f"data/a{i}.jpg"
             img = cv2.imread(file)
             img = img.transpose((2, 0, 1))
@@ -37,6 +37,6 @@ class MyDataSet(Dataset):
 def load_real_img():
     trainset = MyDataSet()
     # 创建训练集数据加载器
-    trainloader = DataLoader(trainset, batch_size=1, shuffle=True)
+    trainloader = DataLoader(trainset, batch_size=3, shuffle=True)
 
     return trainloader

@@ -5,7 +5,7 @@ import numpy as np
 
 import cv2
 
-device = "cpu"
+device = "cuda"
 
 
 class GeneratorNet(nn.Module):
@@ -105,7 +105,7 @@ class DiscriminatorNet(nn.Module):
             bias=False,
             device=device,
         )
-        self.bn2 = nn.BatchNorm2d(128)
+        self.bn2 = nn.BatchNorm2d(128,device=device)
 
         self.conv3 = nn.Conv2d(
             in_channels=128,
@@ -116,7 +116,7 @@ class DiscriminatorNet(nn.Module):
             bias=False,
             device=device,
         )
-        self.bn3 = nn.BatchNorm2d(256)
+        self.bn3 = nn.BatchNorm2d(256,device=device)
 
         self.conv4 = nn.Conv2d(
             in_channels=256,
@@ -127,7 +127,7 @@ class DiscriminatorNet(nn.Module):
             bias=False,
             device=device,
         )
-        self.bn4 = nn.BatchNorm2d(512)
+        self.bn4 = nn.BatchNorm2d(512,device=device)
 
         self.conv5 = nn.Conv2d(
             in_channels=512,
