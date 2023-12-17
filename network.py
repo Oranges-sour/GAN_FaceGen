@@ -147,7 +147,7 @@ class DiscriminatorNet(nn.Module):
 
         # print(x.shape)
 
-        x = torch.sigmoid(self.conv5(x))
+        x = self.conv5(x)
 
         x = x.reshape(-1, 1)
 

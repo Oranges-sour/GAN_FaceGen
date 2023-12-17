@@ -29,9 +29,8 @@ real_img = load_real_img()
 generator_net = GeneratorNet()
 discriminator_net = DiscriminatorNet()
 
-correction = nn.BCELoss()
-optimizer_G = optim.Adam(generator_net.parameters(), betas=(0.5,0.999),lr=0.0002)
-optimizer_D = optim.Adam(discriminator_net.parameters(), betas=(0.5,0.999), lr=0.0002)
+optimizer_G = optim.Adam(generator_net.parameters(), betas=(0.5, 0.999), lr=0.0002)
+optimizer_D = optim.Adam(discriminator_net.parameters(), betas=(0.5, 0.999), lr=0.0002)
 
 
 print("hi")
@@ -45,7 +44,7 @@ for epo in range(0, 60000):
         noise = torch.normal(mean=0.0, std=1.0, size=(1, 100), device=device)
 
         gen_img = generator_net(noise)
-        loss_g = correction(discriminator_net(gen_img), on)
+        loss_g = -torch.mean(gen_img.view(-1))
 
         optimizer_G.zero_grad()
         loss_g.backward()
@@ -76,13 +75,11 @@ for epo in range(0, 60000):
 
     if epo % 500 == 0:
         screen.fill((0, 0, 0))
-        
 
         generator_net.eval()
         with torch.no_grad():
             for kkk in range(0, 8):
                 for jjj in range(0, 8):
-
                     rand_gen = torch.Generator(device=device)
                     rand_gen.manual_seed(kkk * 100 + jjj)
 
