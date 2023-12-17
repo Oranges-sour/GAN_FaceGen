@@ -31,7 +31,7 @@ discriminator_net = DiscriminatorNet()
 
 correction = nn.BCELoss()
 optimizer_G = optim.Adam(generator_net.parameters(), betas=(0.5,0.999),lr=0.0002)
-optimizer_D = optim.Adam(discriminator_net.parameters(), betas=(0.5,0.999), lr=0.00002)
+optimizer_D = optim.Adam(discriminator_net.parameters(), betas=(0.5,0.999), lr=0.0002)
 
 
 print("hi")
