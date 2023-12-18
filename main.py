@@ -22,6 +22,7 @@ from network import DiscriminatorNet
 from network import device
 
 from tools import load_real_img
+from tools import batch_size
 
 
 real_img = load_real_img()
@@ -29,8 +30,8 @@ real_img = load_real_img()
 generator_net = GeneratorNet()
 discriminator_net = DiscriminatorNet()
 
-optimizer_G = optim.Adam(generator_net.parameters(), betas=(0.5, 0.999), lr=0.0002)
-optimizer_D = optim.Adam(discriminator_net.parameters(), betas=(0.5, 0.999), lr=0.0002)
+optimizer_G = optim.RMSprop(generator_net.parameters(), lr=5e-5)
+optimizer_D = optim.RMSprop(discriminator_net.parameters(), lr=5e-5)
 
 
 print("hi")
@@ -39,41 +40,37 @@ ze = torch.zeros((1, 1), requires_grad=False, device=device)
 on = torch.ones((1, 1), requires_grad=False, device=device)
 
 for epo in range(0, 60000):
-    # 训练生成器
-    for _ in range(0, 3):
-        noise = torch.normal(mean=0.0, std=1.0, size=(1, 100), device=device)
-
-        gen_img = generator_net(noise)
-        loss_g = -torch.mean(gen_img.view(-1))
-
-        optimizer_G.zero_grad()
-        loss_g.backward()
-        optimizer_G.step()
-
     # 训练分类器
-    real_loss = None
-    count = 0.0
     for i, data in enumerate(real_img, 0):
         a, b = data
 
-        lloss = correction(discriminator_net(a), b)
-        if real_loss == None:
-            real_loss = lloss
-        else:
-            real_loss += lloss
-        count += 1
-    real_loss /= count
+        noise = torch.normal(mean=0.0, std=1.0, size=(batch_size, 100), device=device)
+        gen_img = generator_net(noise).detach()
 
-    # real_loss = correction(discriminator_net(real_img[0]), on)
-    fake_loss = correction(discriminator_net(gen_img.detach()), ze)
+        real_score = discriminator_net(a)
 
-    loss_d = (real_loss + fake_loss) / 2
+        fake_score = discriminator_net(gen_img)
 
-    optimizer_D.zero_grad()
-    loss_d.backward()
-    optimizer_D.step()
+        loss_d = -(torch.mean(real_score) - torch.mean(fake_score))
 
-    if epo % 500 == 0:
+        optimizer_D.zero_grad()
+        loss_d.backward()
+        optimizer_D.step()
+
+        for p in discriminator_net.parameters():
+            p.data.clamp_(-0.01, 0.01)
+
+    # 训练生成器
+    noise = torch.normal(mean=0.0, std=1.0, size=(batch_size, 100), device=device)
+
+    gen_img = generator_net(noise)
+    loss_g = -torch.mean(gen_img.view(-1))
+
+    optimizer_G.zero_grad()
+    loss_g.backward()
+    optimizer_G.step()
+
+    if epo % 20 == 0:
         screen.fill((0, 0, 0))
 
         generator_net.eval()
@@ -135,7 +132,7 @@ for epo in range(0, 60000):
 
         pygame.image.save(screen, f"out/{epo}.jpg")
         print(
-            f"{epo}:g:{loss_g.item():.4f}  d:{loss_d.item():4f} d1:{real_loss.item():.4f} d2:{fake_loss.item():.4f}"
+            f"{epo}:g:{loss_g.item():.4f}  d:{loss_d.item():4f} real_score:{torch.mean(real_score).item():.4f} fake_score:{torch.mean(fake_score).item():.4f}"
         )
 
 # torch.save(generator_net, "model_1.pth")

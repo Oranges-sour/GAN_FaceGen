@@ -5,7 +5,8 @@ import numpy as np
 
 import cv2
 
-device = "cuda"
+device = "mps"
+
 
 
 class GeneratorNet(nn.Module):

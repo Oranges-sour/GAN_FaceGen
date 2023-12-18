@@ -7,6 +7,9 @@ from network import device
 from torch.utils.data import DataLoader, Dataset
 
 
+batch_size = 3
+
+
 # 载入自己的样本数据
 class MyDataSet(Dataset):
     def __init__(self):
@@ -37,6 +40,6 @@ class MyDataSet(Dataset):
 def load_real_img():
     trainset = MyDataSet()
     # 创建训练集数据加载器
-    trainloader = DataLoader(trainset, batch_size=3, shuffle=True)
+    trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
 
     return trainloader
