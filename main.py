@@ -64,7 +64,7 @@ for epo in range(0, 60000):
     noise = torch.normal(mean=0.0, std=1.0, size=(batch_size, 100), device=device)
 
     gen_img = generator_net(noise)
-    loss_g = -torch.mean(gen_img.view(-1))
+    loss_g = -torch.mean(discriminator_net(gen_img))
 
     optimizer_G.zero_grad()
     loss_g.backward()
