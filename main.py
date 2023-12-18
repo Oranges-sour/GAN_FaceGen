@@ -30,8 +30,8 @@ generator_net = GeneratorNet()
 discriminator_net = DiscriminatorNet()
 
 correction = nn.BCELoss()
-optimizer_G = optim.Adam(generator_net.parameters(), betas=(0.5,0.999),lr=0.0002)
-optimizer_D = optim.Adam(discriminator_net.parameters(), betas=(0.5,0.999), lr=0.0002)
+optimizer_G = optim.Adam(generator_net.parameters(), betas=(0.5, 0.999), lr=0.0002)
+optimizer_D = optim.Adam(discriminator_net.parameters(), betas=(0.5, 0.999), lr=0.0002)
 
 
 print("hi")
@@ -42,7 +42,8 @@ on = torch.ones((1, 1), requires_grad=False, device=device)
 for epo in range(0, 60000):
     # 训练生成器
     for _ in range(0, 3):
-        noise = torch.normal(mean=0.0, std=1.0, size=(1, 100), device=device)
+        noise = (torch.rand(size=(1, 100), device=device) - 0.5) * 2
+        # noise = torch.normal(mean=0.0, std=1.0, size=(1, 100), device=device)
 
         gen_img = generator_net(noise)
         loss_g = correction(discriminator_net(gen_img), on)
@@ -74,25 +75,27 @@ for epo in range(0, 60000):
     loss_d.backward()
     optimizer_D.step()
 
-    if epo % 500 == 0:
+    if epo % 50 == 0:
         screen.fill((0, 0, 0))
-        
 
         generator_net.eval()
         with torch.no_grad():
             for kkk in range(0, 8):
                 for jjj in range(0, 8):
-
                     rand_gen = torch.Generator(device=device)
                     rand_gen.manual_seed(kkk * 100 + jjj)
 
-                    noise = torch.normal(
-                        mean=0.0,
-                        std=1.0,
-                        size=(1, 100),
-                        generator=rand_gen,
-                        device=device,
-                    )
+                    # noise = torch.normal(
+                    #     mean=0.0,
+                    #     std=1.0,
+                    #     size=(1, 100),
+                    #     generator=rand_gen,
+                    #     device=device,
+                    # )
+                    noise = (
+                        torch.rand(size=(1, 100), generator=rand_gen, device=device)
+                        - 0.5
+                    ) * 2
                     gi = generator_net(noise)
                     # gi = real_img[1]
                     # # print(gi.shape)

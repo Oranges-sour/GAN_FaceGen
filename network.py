@@ -5,7 +5,7 @@ import numpy as np
 
 import cv2
 
-device = "cuda"
+device = "mps"
 
 
 class GeneratorNet(nn.Module):
@@ -14,26 +14,15 @@ class GeneratorNet(nn.Module):
 
         self.tconv1 = nn.ConvTranspose2d(
             in_channels=100,
-            out_channels=1024,
-            kernel_size=4,
-            stride=2,
-            bias=False,
-            device=device,
-        )
-        self.bn1 = nn.BatchNorm2d(num_features=1024, device=device)
-
-        self.tconv2 = nn.ConvTranspose2d(
-            in_channels=1024,
             out_channels=512,
             kernel_size=4,
             stride=2,
-            padding=1,
             bias=False,
             device=device,
         )
-        self.bn2 = nn.BatchNorm2d(num_features=512, device=device)
+        self.bn1 = nn.BatchNorm2d(num_features=512, device=device)
 
-        self.tconv3 = nn.ConvTranspose2d(
+        self.tconv2 = nn.ConvTranspose2d(
             in_channels=512,
             out_channels=256,
             kernel_size=4,
@@ -42,9 +31,9 @@ class GeneratorNet(nn.Module):
             bias=False,
             device=device,
         )
-        self.bn3 = nn.BatchNorm2d(num_features=256, device=device)
+        self.bn2 = nn.BatchNorm2d(num_features=256, device=device)
 
-        self.tconv4 = nn.ConvTranspose2d(
+        self.tconv3 = nn.ConvTranspose2d(
             in_channels=256,
             out_channels=128,
             kernel_size=4,
@@ -53,10 +42,21 @@ class GeneratorNet(nn.Module):
             bias=False,
             device=device,
         )
-        self.bn4 = nn.BatchNorm2d(num_features=128, device=device)
+        self.bn3 = nn.BatchNorm2d(num_features=128, device=device)
+
+        self.tconv4 = nn.ConvTranspose2d(
+            in_channels=128,
+            out_channels=64,
+            kernel_size=4,
+            stride=2,
+            padding=1,
+            bias=False,
+            device=device,
+        )
+        self.bn4 = nn.BatchNorm2d(num_features=64, device=device)
 
         self.tconv5 = nn.ConvTranspose2d(
-            in_channels=128,
+            in_channels=64,
             out_channels=3,
             kernel_size=3,
             stride=1,
@@ -88,7 +88,7 @@ class DiscriminatorNet(nn.Module):
 
         self.conv1 = nn.Conv2d(
             in_channels=3,
-            out_channels=64,
+            out_channels=8,
             kernel_size=4,
             stride=1,
             padding=1,
@@ -97,40 +97,40 @@ class DiscriminatorNet(nn.Module):
         )
 
         self.conv2 = nn.Conv2d(
-            in_channels=64,
-            out_channels=128,
+            in_channels=8,
+            out_channels=16,
             kernel_size=4,
             stride=2,
             padding=1,
             bias=False,
             device=device,
         )
-        self.bn2 = nn.BatchNorm2d(128,device=device)
+        self.bn2 = nn.BatchNorm2d(16,device=device)
 
         self.conv3 = nn.Conv2d(
-            in_channels=128,
-            out_channels=256,
+            in_channels=16,
+            out_channels=32,
             kernel_size=4,
             stride=2,
             padding=1,
             bias=False,
             device=device,
         )
-        self.bn3 = nn.BatchNorm2d(256,device=device)
+        self.bn3 = nn.BatchNorm2d(32,device=device)
 
         self.conv4 = nn.Conv2d(
-            in_channels=256,
-            out_channels=512,
+            in_channels=32,
+            out_channels=64,
             kernel_size=4,
             stride=2,
             padding=1,
             bias=False,
             device=device,
         )
-        self.bn4 = nn.BatchNorm2d(512,device=device)
+        self.bn4 = nn.BatchNorm2d(64,device=device)
 
         self.conv5 = nn.Conv2d(
-            in_channels=512,
+            in_channels=64,
             out_channels=1,
             kernel_size=3,
             stride=1,
