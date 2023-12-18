@@ -5,75 +5,25 @@ import numpy as np
 
 import cv2
 
-device = "mps"
-
+device = "cpu"
 
 
 class GeneratorNet(nn.Module):
     def __init__(self) -> None:
         super(GeneratorNet, self).__init__()
 
-        self.tconv1 = nn.ConvTranspose2d(
-            in_channels=100,
-            out_channels=1024,
-            kernel_size=4,
-            stride=2,
-            bias=False,
-            device=device,
-        )
-        self.bn1 = nn.BatchNorm2d(num_features=1024, device=device)
-
-        self.tconv2 = nn.ConvTranspose2d(
-            in_channels=1024,
-            out_channels=512,
-            kernel_size=4,
-            stride=2,
-            padding=1,
-            bias=False,
-            device=device,
-        )
-        self.bn2 = nn.BatchNorm2d(num_features=512, device=device)
-
-        self.tconv3 = nn.ConvTranspose2d(
-            in_channels=512,
-            out_channels=256,
-            kernel_size=4,
-            stride=2,
-            padding=1,
-            bias=False,
-            device=device,
-        )
-        self.bn3 = nn.BatchNorm2d(num_features=256, device=device)
-
-        self.tconv4 = nn.ConvTranspose2d(
-            in_channels=256,
-            out_channels=128,
-            kernel_size=4,
-            stride=2,
-            padding=1,
-            bias=False,
-            device=device,
-        )
-        self.bn4 = nn.BatchNorm2d(num_features=128, device=device)
-
-        self.tconv5 = nn.ConvTranspose2d(
-            in_channels=128,
-            out_channels=3,
-            kernel_size=3,
-            stride=1,
-            padding=1,
-            bias=False,
-            device=device,
-        )
+        self.fc1 = nn.Linear(100, 256, device=device)
+        self.fc2 = nn.Linear(256, 1024, device=device)
+        self.fc3 = nn.Linear(1024, 1024 * 3, device=device)
 
     def forward(self, x):
-        x = x.reshape(-1, 100, 1, 1)
+        x = x.reshape(-1, 100)
 
-        x = torch.relu(self.bn1(self.tconv1(x)))
-        x = torch.relu(self.bn2(self.tconv2(x)))
-        x = torch.relu(self.bn3(self.tconv3(x)))
-        x = torch.relu(self.bn4(self.tconv4(x)))
-        x = torch.tanh(self.tconv5(x))
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        x = torch.tanh(self.fc3(x))
+
+        x = x.reshape(-1, 3, 32, 32)
 
         # print(x.shape)
         # x = torch.nn.functional.interpolate(x, size=(32, 32), mode="bilinear")
@@ -90,65 +40,38 @@ class DiscriminatorNet(nn.Module):
         self.conv1 = nn.Conv2d(
             in_channels=3,
             out_channels=64,
-            kernel_size=4,
+            kernel_size=3,
             stride=1,
             padding=1,
-            bias=False,
             device=device,
         )
+        self.pool1 = nn.MaxPool2d(2, 2)
 
         self.conv2 = nn.Conv2d(
             in_channels=64,
             out_channels=128,
-            kernel_size=4,
-            stride=2,
-            padding=1,
-            bias=False,
-            device=device,
-        )
-        self.bn2 = nn.BatchNorm2d(128,device=device)
-
-        self.conv3 = nn.Conv2d(
-            in_channels=128,
-            out_channels=256,
-            kernel_size=4,
-            stride=2,
-            padding=1,
-            bias=False,
-            device=device,
-        )
-        self.bn3 = nn.BatchNorm2d(256,device=device)
-
-        self.conv4 = nn.Conv2d(
-            in_channels=256,
-            out_channels=512,
-            kernel_size=4,
-            stride=2,
-            padding=1,
-            bias=False,
-            device=device,
-        )
-        self.bn4 = nn.BatchNorm2d(512,device=device)
-
-        self.conv5 = nn.Conv2d(
-            in_channels=512,
-            out_channels=1,
             kernel_size=3,
-            stride=1,
-            padding=0,
-            bias=False,
+            stride=2,
+            padding=1,
             device=device,
         )
+        self.pool2 = nn.MaxPool2d(2, 2)
+
+        self.fc1 = nn.Linear(128 * 4 * 4, 128, device=device)
+        self.fc2 = nn.Linear(128, 1, device=device)
 
     def forward(self, x):
         x = self.leaky(self.conv1(x))
-        x = self.leaky(self.bn2(self.conv2(x)))
-        x = self.leaky(self.bn3(self.conv3(x)))
-        x = self.leaky(self.bn4(self.conv4(x)))
+        x = self.pool1(x)
+        x = self.leaky(self.conv2(x))
+        x = self.pool2(x)
 
         # print(x.shape)
 
-        x = self.conv5(x)
+        x = x.reshape(-1, 128 * 4 * 4)
+
+        x = self.leaky(self.fc1(x))
+        x = self.fc2(x)
 
         x = x.reshape(-1, 1)
 
