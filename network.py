@@ -12,8 +12,8 @@ class GeneratorNet(nn.Module):
     def __init__(self) -> None:
         super(GeneratorNet, self).__init__()
 
-        self.fc1 = nn.Linear(100, 256, device=device)
-        self.fc2 = nn.Linear(256, 1024, device=device)
+        self.fc1 = nn.Linear(100, 512, device=device)
+        self.fc2 = nn.Linear(512, 1024, device=device)
         self.fc3 = nn.Linear(1024, 1024 * 3, device=device)
 
     def forward(self, x):
