@@ -7,14 +7,14 @@ from network import device
 from torch.utils.data import DataLoader, Dataset
 
 
-batch_size = 3
+batch_size = 2
 
 
 # 载入自己的样本数据
 class MyDataSet(Dataset):
     def __init__(self):
         self.sample = []
-        for i in range(0, 21):
+        for i in range(0, 28):
             file = f"data/a{i}.jpg"
             img = cv2.imread(file)
             img = img.transpose((2, 0, 1))
