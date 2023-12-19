@@ -14,14 +14,19 @@ class GeneratorNet(nn.Module):
 
         self.fc1 = nn.Linear(100, 512, device=device)
         self.fc2 = nn.Linear(512, 1024, device=device)
-        self.fc3 = nn.Linear(1024, 1024 * 3, device=device)
+        self.fc3 = nn.Linear(1024, 16 * 16 * 32 * 3, device=device)
+        self.conv1 = nn.ConvTranspose2d(
+            in_channels=32 * 3, out_channels=3, kernel_size=4, stride=2, padding=1,device=device
+        )
 
     def forward(self, x):
         x = x.reshape(-1, 100)
 
         x = torch.relu(self.fc1(x))
         x = torch.relu(self.fc2(x))
-        x = torch.tanh(self.fc3(x))
+        x = torch.relu(self.fc3(x))
+        x = x.reshape(-1,32 * 3,16,16)
+        x = torch.tanh(self.conv1(x))
 
         x = x.reshape(-1, 3, 32, 32)
 
