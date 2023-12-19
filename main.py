@@ -36,8 +36,8 @@ summary(generator_net, input_size=(1, 100))
 summary(discriminator_net, input_size=(3, 32, 32))
 
 
-optimizer_G = optim.Adam(generator_net.parameters(), lr=5e-4)
-optimizer_D = optim.Adam(discriminator_net.parameters(), lr=5e-4)
+optimizer_G = optim.Adam(generator_net.parameters(), lr=1e-4, betas=(0, 0.9))
+optimizer_D = optim.Adam(discriminator_net.parameters(), lr=1e-4, betas=(0, 0.9))
 
 
 print("hi")
@@ -45,7 +45,7 @@ print("hi")
 ze = torch.zeros((1, 1), requires_grad=False, device=device)
 on = torch.ones((1, 1), requires_grad=False, device=device)
 
-for epo in range(0, 30000):
+for epo in range(0, 50000):
     # 训练分类器
     for i, data in enumerate(real_img_data, 0):
         real_img = data
@@ -88,8 +88,8 @@ for epo in range(0, 30000):
         loss_d.backward()
         optimizer_D.step()
 
-        for p in discriminator_net.parameters():
-            p.data.clamp_(-0.01, 0.01)
+        # for p in discriminator_net.parameters():
+        #     p.data.clamp_(-0.01, 0.01)
 
     # 训练生成器
     noise = torch.normal(mean=0.0, std=1.0, size=(batch_size, 100), device=device)
@@ -100,6 +100,12 @@ for epo in range(0, 30000):
     optimizer_G.zero_grad()
     loss_g.backward()
     optimizer_G.step()
+
+    for event in pygame.event.get():
+        # 判断用户是否点了关闭按钮
+        if event.type == pygame.QUIT:
+            # 卸载所有模块
+            pygame.quit()
 
     if epo % 1000 == 0:
         screen.fill((0, 0, 0))
@@ -122,12 +128,6 @@ for epo in range(0, 30000):
                     # gi = real_img[1]
                     # # print(gi.shape)
                     # gi = gi.reshape(-1, 3, 32, 32)
-
-                    for event in pygame.event.get():
-                        # 判断用户是否点了关闭按钮
-                        if event.type == pygame.QUIT:
-                            # 卸载所有模块
-                            pygame.quit()
 
                     gi = gi / 2 + 0.5
                     gi = gi.to(device="cpu")
