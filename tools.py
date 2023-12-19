@@ -32,7 +32,7 @@ class MyDataSet(Dataset):
         return len(self.sample)
 
     def __getitem__(self, index):
-        sample = self.sample[index][0], self.sample[index][1]
+        sample = self.sample[index][0]
 
         return sample
 
