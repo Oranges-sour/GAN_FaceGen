@@ -36,8 +36,8 @@ summary(generator_net, input_size=(1, 100))
 summary(discriminator_net, input_size=(3, 32, 32))
 
 
-optimizer_G = optim.Adam(generator_net.parameters(), lr=5e-5, betas=(0, 0.9))
-optimizer_D = optim.Adam(discriminator_net.parameters(), lr=5e-5, betas=(0, 0.9))
+optimizer_G = optim.Adam(generator_net.parameters(), lr=5e-4)
+optimizer_D = optim.Adam(discriminator_net.parameters(), lr=5e-4)
 
 
 print("hi")
@@ -88,8 +88,8 @@ for epo in range(0, 30000):
         loss_d.backward()
         optimizer_D.step()
 
-        # for p in discriminator_net.parameters():
-        #     p.data.clamp_(-0.01, 0.01)
+        for p in discriminator_net.parameters():
+            p.data.clamp_(-0.01, 0.01)
 
     # 训练生成器
     noise = torch.normal(mean=0.0, std=1.0, size=(batch_size, 100), device=device)
