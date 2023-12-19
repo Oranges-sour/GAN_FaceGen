@@ -24,11 +24,18 @@ from network import device
 from tools import load_real_img
 from tools import batch_size
 
+from torchsummary import summary
+
 
 real_img = load_real_img()
 
 generator_net = GeneratorNet()
 discriminator_net = DiscriminatorNet()
+
+summary(generator_net, input_size=(1, 100))
+summary(discriminator_net, input_size=(3, 32, 32))
+
+exit(0)
 
 optimizer_G = optim.RMSprop(generator_net.parameters(), lr=5e-5)
 optimizer_D = optim.RMSprop(discriminator_net.parameters(), lr=5e-5)

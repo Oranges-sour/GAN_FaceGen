@@ -5,7 +5,7 @@ import numpy as np
 
 import cv2
 
-device = "cuda"
+device = "cpu"
 
 
 class GeneratorNet(nn.Module):
@@ -14,9 +14,32 @@ class GeneratorNet(nn.Module):
 
         self.fc1 = nn.Linear(100, 512, device=device)
         self.fc2 = nn.Linear(512, 1024, device=device)
-        self.fc3 = nn.Linear(1024, 16 * 16 * 32 * 3, device=device)
+
         self.conv1 = nn.ConvTranspose2d(
-            in_channels=32 * 3, out_channels=3, kernel_size=4, stride=2, padding=1,device=device
+            in_channels=64,
+            out_channels=256,
+            kernel_size=4,
+            stride=2,
+            padding=1,
+            device=device,
+        )
+
+        self.conv2 = nn.ConvTranspose2d(
+            in_channels=256,
+            out_channels=378,
+            kernel_size=4,
+            stride=2,
+            padding=1,
+            device=device,
+        )
+
+        self.conv3 = nn.ConvTranspose2d(
+            in_channels=378,
+            out_channels=3,
+            kernel_size=4,
+            stride=2,
+            padding=1,
+            device=device,
         )
 
     def forward(self, x):
@@ -24,9 +47,12 @@ class GeneratorNet(nn.Module):
 
         x = torch.relu(self.fc1(x))
         x = torch.relu(self.fc2(x))
-        x = torch.relu(self.fc3(x))
-        x = x.reshape(-1,32 * 3,16,16)
-        x = torch.tanh(self.conv1(x))
+
+        x = x.reshape(-1, 64, 4, 4)
+
+        x = torch.relu(self.conv1(x))
+        x = torch.relu(self.conv2(x))
+        x = torch.tanh(self.conv3(x))
 
         x = x.reshape(-1, 3, 32, 32)
 
@@ -56,24 +82,34 @@ class DiscriminatorNet(nn.Module):
             in_channels=128,
             out_channels=196,
             kernel_size=3,
+            stride=1,
+            padding=1,
+            device=device,
+        )
+
+        self.conv3 = nn.Conv2d(
+            in_channels=196,
+            out_channels=256,
+            kernel_size=3,
             stride=2,
             padding=1,
             device=device,
         )
-        self.pool2 = nn.MaxPool2d(2, 2)
+        self.pool3 = nn.MaxPool2d(2, 2)
 
-        self.fc1 = nn.Linear(196 * 4 * 4, 256, device=device)
+        self.fc1 = nn.Linear(256 * 4 * 4, 256, device=device)
         self.fc2 = nn.Linear(256, 1, device=device)
 
     def forward(self, x):
         x = self.leaky(self.conv1(x))
         x = self.pool1(x)
         x = self.leaky(self.conv2(x))
-        x = self.pool2(x)
+        x = self.leaky(self.conv3(x))
+        x = self.pool3(x)
 
         # print(x.shape)
 
-        x = x.reshape(-1, 196 * 4 * 4)
+        x = x.reshape(-1, 256 * 4 * 4)
 
         x = self.leaky(self.fc1(x))
         x = self.fc2(x)
