@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 
+import math
+
 import random
 
 import cv2
@@ -46,6 +48,8 @@ print("hi")
 
 ze = torch.zeros((1, 1), requires_grad=False, device=device)
 on = torch.ones((1, 1), requires_grad=False, device=device)
+
+running_w_distance = None
 
 for epo in range(0, 50000):
     # 训练分类器
@@ -103,13 +107,22 @@ for epo in range(0, 50000):
     loss_g.backward()
     optimizer_G.step()
 
+    if running_w_distance == None:
+        running_w_distance = abs(
+            torch.mean(real_score).item() - torch.mean(fake_score).item()
+        )
+    else:
+        running_w_distance = 0.9 * running_w_distance + 0.1 * abs(
+            torch.mean(real_score).item() - torch.mean(fake_score).item()
+        )
+
     for event in pygame.event.get():
         # 判断用户是否点了关闭按钮
         if event.type == pygame.QUIT:
             # 卸载所有模块
             pygame.quit()
 
-    if epo % 1000 == 0:
+    if epo % 50 == 0:
         screen.fill((0, 0, 0))
 
         generator_net.eval()
@@ -165,7 +178,7 @@ for epo in range(0, 50000):
 
         pygame.image.save(screen, f"out/{epo}.jpg")
         print(
-            f"{epo}:g:{loss_g.item():.4f}  d:{loss_d.item():4f} real_score:{torch.mean(real_score).item():.4f} fake_score:{torch.mean(fake_score).item():.4f}"
+            f"{epo}:g:{loss_g.item():.4f}  d:{loss_d.item():.4f} w_distance:{running_w_distance:.4f}"
         )
 
 # torch.save(generator_net, "model_1.pth")
