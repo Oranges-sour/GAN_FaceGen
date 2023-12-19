@@ -7,16 +7,17 @@ from network import device
 from torch.utils.data import DataLoader, Dataset
 
 
-batch_size = 7
+batch_size = 5
 
 
 # 载入自己的样本数据
 class MyDataSet(Dataset):
     def __init__(self):
         self.sample = []
-        for i in range(0, 28):
-            file = f"data/a{i}.jpg"
+        for i in range(0, 100):
+            file = f"data1/b{i}.jpg"
             img = cv2.imread(file)
+            img = cv2.resize(img,dsize=(32,32))
             img = img.transpose((2, 0, 1))
 
             img = img / 255.0
