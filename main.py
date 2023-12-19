@@ -32,10 +32,10 @@ real_img = load_real_img()
 generator_net = GeneratorNet()
 discriminator_net = DiscriminatorNet()
 
-summary(generator_net, input_size=(1, 100))
-summary(discriminator_net, input_size=(3, 32, 32))
+# summary(generator_net, input_size=(1, 100))
+# summary(discriminator_net, input_size=(3, 32, 32))
 
-exit(0)
+#exit(0)
 
 optimizer_G = optim.RMSprop(generator_net.parameters(), lr=5e-5)
 optimizer_D = optim.RMSprop(discriminator_net.parameters(), lr=5e-5)
