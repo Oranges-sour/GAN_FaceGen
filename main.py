@@ -32,8 +32,10 @@ real_img_data = load_real_img()
 generator_net = GeneratorNet()
 discriminator_net = DiscriminatorNet()
 
-summary(generator_net, input_size=(1, 100))
-summary(discriminator_net, input_size=(3, 32, 32))
+summary(generator_net, input_size=(batch_size, 1, 100))
+summary(discriminator_net, input_size=(batch_size, 3, 64, 64))
+
+# exit(0)
 
 
 optimizer_G = optim.Adam(generator_net.parameters(), lr=1e-4, betas=(0, 0.9))
