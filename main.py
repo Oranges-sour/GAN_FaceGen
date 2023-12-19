@@ -30,8 +30,8 @@ real_img = load_real_img()
 generator_net = GeneratorNet()
 discriminator_net = DiscriminatorNet()
 
-optimizer_G = optim.RMSprop(generator_net.parameters(), lr=5e-5)
-optimizer_D = optim.RMSprop(discriminator_net.parameters(), lr=5e-5)
+optimizer_G = optim.RMSprop(generator_net.parameters(), lr=5e-4)
+optimizer_D = optim.RMSprop(discriminator_net.parameters(), lr=5e-4)
 
 
 print("hi")
@@ -39,7 +39,7 @@ print("hi")
 ze = torch.zeros((1, 1), requires_grad=False, device=device)
 on = torch.ones((1, 1), requires_grad=False, device=device)
 
-for epo in range(0, 60000):
+for epo in range(0, 30000):
     # 训练分类器
     for i, data in enumerate(real_img, 0):
         a, b = data
@@ -70,7 +70,7 @@ for epo in range(0, 60000):
     loss_g.backward()
     optimizer_G.step()
 
-    if epo % 20 == 0:
+    if epo % 500 == 0:
         screen.fill((0, 0, 0))
 
         generator_net.eval()

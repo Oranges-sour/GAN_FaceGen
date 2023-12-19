@@ -5,7 +5,7 @@ import numpy as np
 
 import cv2
 
-device = "cpu"
+device = "cuda"
 
 
 class GeneratorNet(nn.Module):
@@ -39,7 +39,7 @@ class DiscriminatorNet(nn.Module):
 
         self.conv1 = nn.Conv2d(
             in_channels=3,
-            out_channels=64,
+            out_channels=128,
             kernel_size=3,
             stride=1,
             padding=1,
@@ -48,8 +48,8 @@ class DiscriminatorNet(nn.Module):
         self.pool1 = nn.MaxPool2d(2, 2)
 
         self.conv2 = nn.Conv2d(
-            in_channels=64,
-            out_channels=128,
+            in_channels=128,
+            out_channels=196,
             kernel_size=3,
             stride=2,
             padding=1,
@@ -57,8 +57,8 @@ class DiscriminatorNet(nn.Module):
         )
         self.pool2 = nn.MaxPool2d(2, 2)
 
-        self.fc1 = nn.Linear(128 * 4 * 4, 128, device=device)
-        self.fc2 = nn.Linear(128, 1, device=device)
+        self.fc1 = nn.Linear(196 * 4 * 4, 256, device=device)
+        self.fc2 = nn.Linear(256, 1, device=device)
 
     def forward(self, x):
         x = self.leaky(self.conv1(x))
@@ -68,7 +68,7 @@ class DiscriminatorNet(nn.Module):
 
         # print(x.shape)
 
-        x = x.reshape(-1, 128 * 4 * 4)
+        x = x.reshape(-1, 196 * 4 * 4)
 
         x = self.leaky(self.fc1(x))
         x = self.fc2(x)
