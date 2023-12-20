@@ -2,6 +2,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+import torchvision.utils as vutils
+
+from torch.utils.tensorboard.writer import SummaryWriter
 
 import math
 
@@ -9,14 +12,7 @@ import random
 
 import cv2
 
-import pygame
-
-# 使用pygame之前必须初始化
-pygame.init()
-# 设置主屏窗口
-screen = pygame.display.set_mode((64 * 1 * 8, 64 * 1 * 8))
-screen.fill((0, 0, 0))
-pygame.display.set_caption("main")
+import time
 
 
 from network import GeneratorNet
@@ -39,17 +35,15 @@ summary(discriminator_net, input_size=(batch_size, 3, 64, 64))
 
 # exit(0)
 
+# 日志目录
+log_dir_num = f"{int(time.time())}"
+print(f"logs/{log_dir_num}")
+writer = SummaryWriter(f"logs/{log_dir_num}")
+
 
 optimizer_G = optim.Adam(generator_net.parameters(), lr=1e-4, betas=(0, 0.9))
 optimizer_D = optim.Adam(discriminator_net.parameters(), lr=1e-4, betas=(0, 0.9))
 
-
-print("hi")
-
-ze = torch.zeros((1, 1), requires_grad=False, device=device)
-on = torch.ones((1, 1), requires_grad=False, device=device)
-
-running_w_distance = None
 
 for epo in range(0, 50000):
     # 训练分类器
@@ -107,78 +101,36 @@ for epo in range(0, 50000):
     loss_g.backward()
     optimizer_G.step()
 
-    if running_w_distance == None:
-        running_w_distance = abs(
-            torch.mean(real_score).item() - torch.mean(fake_score).item()
-        )
-    else:
-        running_w_distance = 0.9 * running_w_distance + 0.1 * abs(
-            torch.mean(real_score).item() - torch.mean(fake_score).item()
-        )
+    writer.add_scalars(
+        "loss", {"generator": loss_g.item(), "critic": loss_d.item()}, epo
+    )
+    writer.add_scalar(
+        "w_distance",
+        abs(torch.mean(real_score).item() - torch.mean(fake_score).item()),
+        epo,
+    )
 
-    for event in pygame.event.get():
-        # 判断用户是否点了关闭按钮
-        if event.type == pygame.QUIT:
-            # 卸载所有模块
-            pygame.quit()
-
-    if epo % 50 == 0:
-        screen.fill((0, 0, 0))
+    if epo % 2 == 0:
+        # screen.fill((0, 0, 0))
+        rand_gen = torch.Generator(device=device)
+        rand_gen.manual_seed(114514)
+        noise = torch.normal(
+            mean=0.0,
+            std=1.0,
+            size=(64, 1, 100),
+            generator=rand_gen,
+            requires_grad=False,
+            device=device,
+        )
 
         generator_net.eval()
         with torch.no_grad():
-            for kkk in range(0, 8):
-                for jjj in range(0, 8):
-                    rand_gen = torch.Generator(device=device)
-                    rand_gen.manual_seed(kkk * 100 + jjj)
-
-                    noise = torch.normal(
-                        mean=0.0,
-                        std=1.0,
-                        size=(1, 100),
-                        generator=rand_gen,
-                        device=device,
-                    )
-                    gi = generator_net(noise)
-                    # gi = real_img[1]
-                    # # print(gi.shape)
-                    # gi = gi.reshape(-1, 3, 32, 32)
-
-                    gi = gi / 2 + 0.5
-                    gi = gi.to(device="cpu")
-                    for i in range(0, 64):
-                        for j in range(0, 64):
-                            w = 1
-                            pygame.draw.rect(
-                                screen,
-                                color=(
-                                    gi[0][2][j][i] * 255,
-                                    gi[0][1][j][i] * 255,
-                                    gi[0][0][j][i] * 255,
-                                ),
-                                rect=(
-                                    kkk * 64 * w + i * w,
-                                    jjj * 64 * w + j * w,
-                                    (i + 1) * w,
-                                    (j + 1) * w,
-                                ),
-                            )
-                            # pygame.draw.rect(
-                            #     screen,
-                            #     color=(
-                            #         255,
-                            #         255,
-                            #         255,
-                            #     ),
-                            #     rect=(i * 6, j * 6, (i + 1) * 6, (j + 1) * 6),
-                            # )
-
-        pygame.display.flip()
+            test_gen_image = generator_net(noise)
         generator_net.train()
 
-        pygame.image.save(screen, f"out/{epo}.jpg")
-        print(
-            f"{epo}:g:{loss_g.item():.4f}  d:{loss_d.item():.4f} w_distance:{running_w_distance:.4f}"
-        )
+        tens = vutils.make_grid(test_gen_image, normalize=True, scale_each=True)
+        writer.add_image("test_generate", tens, epo, dataformats="CHW")
+
+        #print(f"{epo}:g:{loss_g.item():.4f}  d:{loss_d.item():.4f}")
 
 # torch.save(generator_net, "model_1.pth")
