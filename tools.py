@@ -18,7 +18,7 @@ class MyDataSet(Dataset):
             file = f"data1/b{i}.jpg"
             img = cv2.imread(file, cv2.IMREAD_COLOR)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            img = cv2.resize(img, dsize=(64, 64), interpolation=cv2.INTER_LINEAR)
+            img = cv2.resize(img, dsize=(128, 128), interpolation=cv2.INTER_LINEAR)
             img = img.transpose((2, 0, 1))
 
             img = img / 255.0

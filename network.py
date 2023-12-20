@@ -41,7 +41,7 @@ class GeneratorNet(nn.Module):
 
         self.conv4 = nn.ConvTranspose2d(
             in_channels=256,
-            out_channels=128,
+            out_channels=256,
             kernel_size=4,
             stride=2,
             padding=1,
@@ -49,6 +49,15 @@ class GeneratorNet(nn.Module):
         )
 
         self.conv5 = nn.ConvTranspose2d(
+            in_channels=256,
+            out_channels=128,
+            kernel_size=4,
+            stride=2,
+            padding=1,
+            device=device,
+        )
+
+        self.conv6 = nn.ConvTranspose2d(
             in_channels=128,
             out_channels=3,
             kernel_size=4,
@@ -64,9 +73,10 @@ class GeneratorNet(nn.Module):
         x = torch.relu(self.conv2(x))
         x = torch.relu(self.conv3(x))
         x = torch.relu(self.conv4(x))
-        x = torch.tanh(self.conv5(x))
+        x = torch.relu(self.conv5(x))
+        x = torch.tanh(self.conv6(x))
 
-        x = x.reshape(-1, 3, 64, 64)
+        x = x.reshape(-1, 3, 128, 128)
 
         # print(x.shape)
         # x = torch.nn.functional.interpolate(x, size=(32, 32), mode="bilinear")
@@ -111,7 +121,7 @@ class DiscriminatorNet(nn.Module):
             in_channels=256,
             out_channels=256,
             kernel_size=4,
-            stride=2,
+            stride=4,
             padding=1,
             device=device,
         )
@@ -126,7 +136,7 @@ class DiscriminatorNet(nn.Module):
         )
 
     def forward(self, x):
-        x = x.reshape(-1, 3, 64, 64)
+        x = x.reshape(-1, 3, 128, 128)
 
         x = self.leaky(self.conv1(x))
         x = self.leaky(self.conv2(x))

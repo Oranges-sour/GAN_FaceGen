@@ -31,7 +31,7 @@ generator_net = GeneratorNet()
 discriminator_net = DiscriminatorNet()
 
 summary(generator_net, input_size=(batch_size, 1, 100))
-summary(discriminator_net, input_size=(batch_size, 3, 64, 64))
+summary(discriminator_net, input_size=(batch_size, 3, 128, 128))
 
 # exit(0)
 
