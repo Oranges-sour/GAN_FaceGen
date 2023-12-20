@@ -45,7 +45,7 @@ optimizer_G = optim.Adam(generator_net.parameters(), lr=1e-4, betas=(0.5, 0.9))
 optimizer_D = optim.Adam(discriminator_net.parameters(), lr=1e-4, betas=(0.5, 0.9))
 
 
-for epo in range(0, 50000):
+for epo in range(0, 8000):
     # 训练分类器
     for i, data in enumerate(real_img_data, 0):
         real_img = data
