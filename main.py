@@ -41,8 +41,8 @@ print(f"logs/{log_dir_num}")
 writer = SummaryWriter(f"logs/{log_dir_num}")
 
 
-optimizer_G = optim.Adam(generator_net.parameters(), lr=1e-4, betas=(0, 0.9))
-optimizer_D = optim.Adam(discriminator_net.parameters(), lr=1e-4, betas=(0, 0.9))
+optimizer_G = optim.Adam(generator_net.parameters(), lr=1e-4, betas=(0.5, 0.9))
+optimizer_D = optim.Adam(discriminator_net.parameters(), lr=1e-4, betas=(0.5, 0.9))
 
 
 for epo in range(0, 50000):
