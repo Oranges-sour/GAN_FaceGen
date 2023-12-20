@@ -7,7 +7,7 @@ from network import device
 from torch.utils.data import DataLoader, Dataset
 
 
-batch_size = 5
+batch_size = 20
 
 
 # 载入自己的样本数据
