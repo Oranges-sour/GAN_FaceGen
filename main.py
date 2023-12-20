@@ -110,7 +110,7 @@ for epo in range(0, 50000):
         epo,
     )
 
-    if epo % 2 == 0:
+    if epo % 100 == 0:
         # screen.fill((0, 0, 0))
         rand_gen = torch.Generator(device=device)
         rand_gen.manual_seed(114514)
@@ -131,6 +131,6 @@ for epo in range(0, 50000):
         tens = vutils.make_grid(test_gen_image, normalize=True, scale_each=True)
         writer.add_image("test_generate", tens, epo, dataformats="CHW")
 
-        #print(f"{epo}:g:{loss_g.item():.4f}  d:{loss_d.item():.4f}")
+        print(f"{epo}:g:{loss_g.item():.4f}  d:{loss_d.item():.4f}")
 
 # torch.save(generator_net, "model_1.pth")
