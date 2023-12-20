@@ -16,7 +16,8 @@ class MyDataSet(Dataset):
         self.sample = []
         for i in range(0, 100):
             file = f"data1/b{i}.jpg"
-            img = cv2.imread(file)
+            img = cv2.imread(file, cv2.IMREAD_COLOR)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             img = cv2.resize(img, dsize=(64, 64), interpolation=cv2.INTER_LINEAR)
             img = img.transpose((2, 0, 1))
 
