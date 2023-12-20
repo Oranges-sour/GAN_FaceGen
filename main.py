@@ -14,7 +14,7 @@ import pygame
 # 使用pygame之前必须初始化
 pygame.init()
 # 设置主屏窗口
-screen = pygame.display.set_mode((32 * 2 * 8, 32 * 2 * 8))
+screen = pygame.display.set_mode((64 * 1 * 8, 64 * 1 * 8))
 screen.fill((0, 0, 0))
 pygame.display.set_caption("main")
 
@@ -146,9 +146,9 @@ for epo in range(0, 50000):
 
                     gi = gi / 2 + 0.5
                     gi = gi.to(device="cpu")
-                    for i in range(0, 32):
-                        for j in range(0, 32):
-                            w = 2
+                    for i in range(0, 64):
+                        for j in range(0, 64):
+                            w = 1
                             pygame.draw.rect(
                                 screen,
                                 color=(
@@ -157,8 +157,8 @@ for epo in range(0, 50000):
                                     gi[0][0][j][i] * 255,
                                 ),
                                 rect=(
-                                    kkk * 32 * w + i * w,
-                                    jjj * 32 * w + j * w,
+                                    kkk * 64 * w + i * w,
+                                    jjj * 64 * w + j * w,
                                     (i + 1) * w,
                                     (j + 1) * w,
                                 ),
