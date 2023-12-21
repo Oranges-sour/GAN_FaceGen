@@ -14,7 +14,7 @@ class GeneratorNet(nn.Module):
 
         self.conv1 = nn.ConvTranspose2d(
             in_channels=100,
-            out_channels=512,
+            out_channels=1024,
             kernel_size=4,
             stride=2,
             padding=0,
@@ -22,7 +22,7 @@ class GeneratorNet(nn.Module):
         )
 
         self.conv2 = nn.ConvTranspose2d(
-            in_channels=512,
+            in_channels=1024,
             out_channels=512,
             kernel_size=4,
             stride=2,

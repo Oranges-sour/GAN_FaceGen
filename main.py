@@ -45,7 +45,7 @@ optimizer_G = optim.Adam(generator_net.parameters(), lr=5e-4, betas=(0.5, 0.9))
 optimizer_D = optim.Adam(discriminator_net.parameters(), lr=5e-4, betas=(0.5, 0.9))
 
 
-for epo in range(0, 12000):
+for epo in range(0, 42000):
     # 训练分类器
     for i, data in enumerate(real_img_data, 0):
         real_img = data
@@ -136,4 +136,4 @@ for epo in range(0, 12000):
 
         print(f"{epo}:g:{loss_g.item():.4f}  d:{loss_d.item():.4f}")
 
-# torch.save(generator_net, "model_1.pth")
+torch.save(generator_net, "model_1.pth")
