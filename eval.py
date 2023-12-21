@@ -14,7 +14,7 @@ screen.fill((0, 0, 0))
 pygame.display.set_caption("main")
 
 
-network = torch.load("model_1.pth", map_location=device)
+network = torch.load("model_2.pth", map_location=device)
 
 network.eval()
 

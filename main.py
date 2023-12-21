@@ -136,4 +136,4 @@ for epo in range(0, 30000):
 
         print(f"{epo}:g:{loss_g.item():.4f}  d:{loss_d.item():.4f}")
 
-torch.save(generator_net, "model_1.pth")
+torch.save(generator_net, "model_2.pth")
