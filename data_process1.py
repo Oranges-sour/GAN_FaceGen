@@ -16,7 +16,7 @@ for i in filelist:
         # 打开图片
         src = os.path.join(os.path.abspath(path), i)
 
-        img = cv2.imread(src)
+        img = cv2.imread(src,cv2.IMREAD_COLOR)
         cv2.imwrite(f"data/b{j}.jpg", img)
 
         j += 1
