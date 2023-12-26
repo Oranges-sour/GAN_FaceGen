@@ -1,10 +1,11 @@
 from network import GeneratorNet
-from network import device
 import torch
 import numpy as np
 import torchvision
 
 import pygame
+
+device = "cpu"
 
 # 使用pygame之前必须初始化
 pygame.init()
@@ -57,7 +58,7 @@ with torch.no_grad():
         # sur = pygame.surface.Surface(size=(128 * 16, 128 * 16))
         sur = pygame.surfarray.make_surface(array=y)
 
-        pygame.image.save(sur, "123.jpg")
+        pygame.image.save(sur, "124.jpg")
         screen.fill((0, 0, 0))
         screen.blit(sur, dest=(0, 0))
         pygame.display.flip()
